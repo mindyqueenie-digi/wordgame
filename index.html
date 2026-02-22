@@ -9,38 +9,17 @@
         :root { --primary: #1e2a47; --gold: #d4af37; --green: #28a745; --bg: #f4f7f9; }
         body { font-family: 'PingFang TC', sans-serif; background: var(--bg); display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
         .container { background: white; padding: 30px; border-radius: 30px; box-shadow: 0 15px 50px rgba(0,0,0,0.15); max-width: 750px; width: 95%; text-align: center; border-top: 10px solid var(--primary); }
-        
         .stats { display: flex; justify-content: space-between; font-weight: bold; margin-bottom: 10px; }
         .progress-box { width: 100%; height: 12px; background: #eee; border-radius: 10px; margin-bottom: 15px; overflow: hidden; }
         .progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--primary), #4facfe); transition: 0.4s; }
         .stage-tag { display: inline-block; padding: 4px 15px; background: var(--primary); color: white; border-radius: 20px; font-size: 0.9rem; margin-bottom: 10px; }
-
-        /* --- MIBI 顯示修正：解決砍頭問題 --- */
-        .mibi-box { 
-            width: 160px; 
-            height: 160px; 
-            margin: 0 auto 15px auto; 
-            border-radius: 50%; 
-            border: 3px solid #eee;
-            background: #fff;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden; /* 確保圓形外觀 */
-        }
-        .mibi-img { 
-            width: 95%; /* 稍微縮小一點點，留白邊才不會貼齊邊緣 */
-            height: 95%; 
-            object-fit: contain; /* 關鍵：完整顯示圖片內容，不裁切 */
-            transition: 0.3s; 
-        }
+        .mibi-box { width: 160px; height: 160px; margin: 0 auto 15px auto; border-radius: 50%; border: 3px solid #eee; background: #fff; display: flex; justify-content: center; align-items: center; overflow: hidden; }
+        .mibi-img { width: 95%; height: 95%; object-fit: contain; transition: 0.3s; }
         .jump { transform: scale(1.1) translateY(-10px); }
-
         .game-card { background: #fafafa; border-radius: 20px; padding: 25px; min-height: 200px; border: 2px solid #f0f0f0; display: flex; flex-direction: column; justify-content: center; }
         .sentence { font-size: 1.4rem; line-height: 1.6; color: #333; text-align: left; }
         .blank { color: var(--gold); border-bottom: 3px dashed var(--gold); font-weight: bold; padding: 0 5px; }
         .win-word { color: var(--green); border-bottom: 3px solid var(--green); font-weight: bold; }
-
         .options { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-top: 20px; }
         .btn { background: white; border: 2px solid var(--primary); padding: 10px 20px; border-radius: 12px; font-weight: bold; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 0 var(--primary); }
         .btn:active { transform: translateY(2px); box-shadow: 0 0px 0 var(--primary); }
@@ -49,32 +28,23 @@
     </style>
 </head>
 <body>
-
 <div class="container">
-    <div class="stats">
-        <span id="timer">⏱️ 00:00</span>
-        <span id="score">🏆 0</span>
-    </div>
+    <div class="stats"><span id="timer">⏱️ 00:00</span><span id="score">🏆 0</span></div>
     <div class="progress-box"><div class="progress-fill" id="pb"></div></div>
-    <div id="stage-tag" class="stage-tag">階段一：字尾變形</div>
-
-    <div class="mibi-box">
-        <img id="mibi-pic" class="mibi-img" src="mib_work.png">
-    </div>
-
+    <div id="stage-tag" class="stage-tag">階段一：字尾變形挑戰</div>
+    <div class="mibi-box"><img id="mibi-pic" class="mibi-img" src="mib_work.png"></div>
     <div id="game" class="game-card"></div>
     <div id="msg"></div>
     <button id="next" class="next-btn" onclick="next()">下一題 NEXT →</button>
 </div>
 
 <script>
-    // 完整的 50 題資料
     const data = [
-        // PHASE 1: Suffixes (1-25)
+        // 1-25 題 (字尾變形)
         { b: "SUCCEED", t: "The plan was a huge ____.", o: ["SUCCESS", "[-FUL]", "[-LY]"], a: "SUCCESS", c: "SUCCESS" },
         { b: "RELY", t: "We need a ____ partner.", o: ["[-ABLE]", "[-ANCE]", "[-LY]"], a: "[-ABLE]", c: "RELIABLE" },
         { b: "PROFESSION", t: "Act in a ____ manner.", o: ["[-AL]", "[-ISM]", "[-LY]"], a: "[-AL]", c: "PROFESSIONAL" },
-        { b: "CONFIRM", t: "Waiting for ____ of the deal.", o: ["[-ATION]", "[-ING]", "[-ED]"], a: "[-ATION]", c: "CONFIRMATION" },
+        { b: "CONFIRM", t: "Wait for ____ of the deal.", o: ["[-ATION]", "[-ING]", "[-ED]"], a: "[-ATION]", c: "CONFIRMATION" },
         { b: "EXPAND", t: "Global ____ is our goal.", o: ["[-ION]", "[-IVE]", "[-ABLE]"], a: "[-ION]", c: "EXPANSION" },
         { b: "ASSIST", t: "Do you need any ____?", o: ["[-ANCE]", "[-ANT]", "[-ED]"], a: "[-ANCE]", c: "ASSISTANCE" },
         { b: "INNOVATE", t: "He has ____ ideas.", o: ["[-IVE]", "[-ION]", "[-OR]"], a: "[-IVE]", c: "INNOVATIVE" },
@@ -97,14 +67,14 @@
         { b: "ORGANIZE", t: "A great ____.", o: ["[-ER]", "[-ATION]", "[-ED]"], a: "[-ER]", c: "ORGANIZER" },
         { b: "INFORM", t: "This is very ____.", o: ["[-ATIVE]", "[-ATION]", "[-ED]"], a: "[-ATIVE]", c: "INFORMATIVE" },
 
-        // PHASE 2: Prefixes (26-50)
+        // 26-50 題 (前綴組裝)
         { g: "遠端會議", target: "TELECONFERENCE", t: "Join the ____.", p: ["TELE-", "VIDEO-", "CO-"], r: ["CONFERENCE", "VISION", "PHONE"], aA: "TELE-", aB: "CONFERENCE" },
         { g: "跨國公司", target: "MULTINATIONAL", t: "A ____ company.", p: ["MULTI-", "INTER-", "TRANS-"], r: ["NATIONAL", "CULTURAL", "ACTIVE"], aA: "MULTI-", aB: "NATIONAL" },
         { g: "預付款項", target: "PREPAYMENT", t: "A ____ is required.", p: ["PRE-", "POST-", "RE-"], r: ["PAYMENT", "ORDER", "FIX"], aA: "PRE-", aB: "PAYMENT" },
         { g: "重新啟動", target: "REACTIVATE", t: "____ your account.", p: ["RE-", "DE-", "OVER-"], r: ["ACTIVATE", "STORE", "PLAY"], aA: "RE-", aB: "ACTIVATE" },
         { g: "子公司", target: "SUBDIVISION", t: "Our Asian ____.", p: ["SUB-", "SUPER-", "TRANS-"], r: ["DIVISION", "SECTION", "PART"], aA: "SUB-", aB: "DIVISION" },
         { g: "共同創辦人", target: "COFOUNDER", t: "She is the ____.", p: ["CO-", "SUB-", "EX-"], r: ["FOUNDER", "WORKER", "AUTHOR"], aA: "CO-", aB: "FOUNDER" },
-        { g: "生態友善", target: "ECOFRIENDLY", t: "Use ____ bags.", p: ["ECO-", "BIO-", "RE-"], r: ["FRIENDLY", "LOGICAL", "ACTIVE"], aA: "ECO-", aB: "FRIENDLY" },
+        { g: "生態友善", target: "ECOFRIENDLY", t: "We use ____ bags.", p: ["ECO-", "BIO-", "RE-"], r: ["FRIENDLY", "LOGICAL", "ACTIVE"], aA: "ECO-", aB: "FRIENDLY" },
         { g: "主管者", target: "SUPERVISOR", t: "Ask your ____.", p: ["SUPER-", "SUB-", "HYPER-"], r: ["VISOR", "VISION", "INTEND"], aA: "SUPER-", aB: "VISOR" },
         { g: "運輸中", target: "TRANSIT", t: "Goods in ____.", p: ["TRANS-", "INTER-", "SUB-"], r: ["IT", "PORT", "FER"], aA: "TRANS-", aB: "IT" },
         { g: "互動式", target: "INTERACTIVE", t: "An ____ app.", p: ["INTER-", "RE-", "PRE-"], r: ["ACTIVE", "ACTION", "CHANGE"], aA: "INTER-", aB: "ACTIVE" },
@@ -126,67 +96,34 @@
     ];
 
     let idx = 0, score = 0, sec = 0, sA = "", sB = "", timer;
-
-    function runTimer() {
-        timer = setInterval(() => {
-            sec++;
-            let m = Math.floor(sec / 60).toString().padStart(2, '0');
-            let s = (sec % 60).toString().padStart(2, '0');
-            document.getElementById('timer').innerText = `⏱️ ${m}:${s}`;
-        }, 1000);
-    }
-
+    function runTimer() { timer = setInterval(() => { sec++; let m = Math.floor(sec/60).toString().padStart(2,'0'), s = (sec%60).toString().padStart(2,'0'); document.getElementById('timer').innerText = `⏱️ ${m}:${s}`; }, 1000); }
     function render() {
-        const q = data[idx]; const g = document.getElementById('game'); const pic = document.getElementById('mibi-pic');
-        document.getElementById('pb').style.width = (idx / 50 * 100) + "%";
+        const q = data[idx], g = document.getElementById('game'), pic = document.getElementById('mibi-pic');
+        document.getElementById('pb').style.width = (idx/50*100)+"%";
         document.getElementById('score').innerText = `🏆 ${score}`;
-        document.getElementById('msg').innerText = "";
-        document.getElementById('next').style.display = "none";
+        document.getElementById('msg').innerText = ""; document.getElementById('next').style.display = "none";
         pic.src = "mib_work.png"; pic.classList.remove('jump');
-
         if (idx < 25) {
-            document.getElementById('stage-tag').innerText = "第一階段：字尾變形";
+            document.getElementById('stage-tag').innerText = "階段一：字尾變形挑戰";
             g.innerHTML = `<div class="sentence">${q.t.replace("____", `<span class="blank">${q.b}</span>`)}</div><div class="options" id="os"></div>`;
-            [...q.o].sort(()=>Math.random()-0.5).forEach(o => {
-                const b = document.createElement('button'); b.className = 'btn'; b.innerText = o;
-                b.onclick = () => { if(o === q.a) win(q.c); else fail(); };
-                document.getElementById('os').appendChild(b);
-            });
+            q.o.forEach(o => { const b = document.createElement('button'); b.className='btn'; b.innerText=o; b.onclick=()=>{ if(o===q.a) win(q.c); else fail(); }; document.getElementById('os').appendChild(b); });
         } else {
-            sA = ""; sB = "";
-            document.getElementById('stage-tag').innerText = "第二階段：字組大師";
-            g.innerHTML = `<div style="color:#888;font-size:0.9rem">目標：${q.g}</div><div class="sentence">${q.t.replace("____", `<span id="pA" class="blank">?</span><span id="pB" class="blank">?</span>`)}</div><div class="options" id="oA"></div><div class="options" id="oB"></div>`;
-            [...q.p].sort(()=>Math.random()-0.5).forEach(p => {
-                const b = document.createElement('button'); b.className = 'btn'; b.innerText = p;
-                b.onclick = () => { sA = p; document.getElementById('pA').innerText = p.replace("-",""); check(q); };
-                document.getElementById('oA').appendChild(b);
-            });
-            [...q.r].sort(()=>Math.random()-0.5).forEach(r => {
-                const b = document.createElement('button'); b.className = 'btn'; b.innerText = r;
-                b.onclick = () => { sB = r; document.getElementById('pB').innerText = r; check(q); };
-                document.getElementById('oB').appendChild(b);
-            });
+            sA = ""; sB = ""; document.getElementById('stage-tag').innerText = "階段二：超級組裝大師";
+            g.innerHTML = `<div style="color:#888;margin-bottom:10px">挑戰：${q.g}</div><div class="sentence">${q.t.replace("____", `<span id="pA" class="blank">?</span><span id="pB" class="blank">?</span>`)}</div><div class="options" id="oA"></div><div class="options" id="oB"></div>`;
+            q.p.forEach(p => { const b = document.createElement('button'); b.className='btn'; b.innerText=p; b.onclick=()=>{ sA=p; document.getElementById('pA').innerText=p.replace("-",""); check(q); }; document.getElementById('oA').appendChild(b); });
+            q.r.forEach(r => { const b = document.createElement('button'); b.className='btn'; b.innerText=r; b.onclick=()=>{ sB=r; document.getElementById('pB').innerText=r; check(q); }; document.getElementById('oB').appendChild(b); });
         }
     }
-
-    function check(q) { if(sA && sB) { if(sA === q.aA && sB === q.aB) win(q.target); else fail(); } }
-    function fail() { document.getElementById('msg').innerHTML = "<span style='color:red'>差一點點！再試試！</span>"; }
-
+    function check(q) { if(sA && sB) { if(sA===q.aA && sB===q.aB) win(q.target); else fail(); } }
+    function fail() { document.getElementById('msg').innerHTML = "<span style='color:red'>哎呀，再想一下下！</span>"; }
     function win(word) {
-        score += 100;
-        const pic = document.getElementById('mibi-pic');
-        pic.src = "mibi_happy.png"; pic.classList.add('jump');
+        score += 100; const pic = document.getElementById('mibi-pic'); pic.src = "mibi_happy.png"; pic.classList.add('jump');
         document.getElementById('game').innerHTML = `<div class="sentence">${data[idx].t.replace("____", `<span class="win-word">${word}</span>`)}</div>`;
-        document.getElementById('msg').innerHTML = "<span style='color:var(--green)'>✨ Mibi 幫你點讚！</span>";
+        document.getElementById('msg').innerHTML = "<span style='color:var(--green)'>✨ 答對了！Mibi 為你喝采！</span>";
         document.getElementById('next').style.display = "block";
         confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
     }
-
-    function next() { idx++; if (idx < 50) render(); else { 
-        document.getElementById('game').innerHTML = `<h2>🏆 通關完成！</h2><p>費時：${document.getElementById('timer').innerText}</p>`;
-        document.getElementById('next').style.display = "none";
-    }}
-
+    function next() { idx++; if (idx < 50) render(); else { clearInterval(timer); document.getElementById('game').innerHTML = `<h2>🏆 5000分大挑戰達成！</h2><p>費時：${document.getElementById('timer').innerText}</p>`; document.getElementById('next').style.display = "none"; } }
     runTimer(); render();
 </script>
 </body>
