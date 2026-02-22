@@ -96,24 +96,50 @@
     ];
 
     let idx = 0, score = 0, sec = 0, sA = "", sB = "", timer;
+
+    // 洗牌函數：確保選項隨機
+    function shuffle(array) {
+        return array.sort(() => Math.random() - 0.5);
+    }
+
     function runTimer() { timer = setInterval(() => { sec++; let m = Math.floor(sec/60).toString().padStart(2,'0'), s = (sec%60).toString().padStart(2,'0'); document.getElementById('timer').innerText = `⏱️ ${m}:${s}`; }, 1000); }
+
     function render() {
         const q = data[idx], g = document.getElementById('game'), pic = document.getElementById('mibi-pic');
         document.getElementById('pb').style.width = (idx/50*100)+"%";
         document.getElementById('score').innerText = `🏆 ${score}`;
         document.getElementById('msg').innerText = ""; document.getElementById('next').style.display = "none";
         pic.src = "mib_work.png"; pic.classList.remove('jump');
+
         if (idx < 25) {
             document.getElementById('stage-tag').innerText = "階段一：字尾變形挑戰";
             g.innerHTML = `<div class="sentence">${q.t.replace("____", `<span class="blank">${q.b}</span>`)}</div><div class="options" id="os"></div>`;
-            q.o.forEach(o => { const b = document.createElement('button'); b.className='btn'; b.innerText=o; b.onclick=()=>{ if(o===q.a) win(q.c); else fail(); }; document.getElementById('os').appendChild(b); });
+            
+            // 隨機排列選項後再生成按鈕
+            shuffle([...q.o]).forEach(o => { 
+                const b = document.createElement('button'); b.className='btn'; b.innerText=o; 
+                b.onclick=()=>{ if(o===q.a) win(q.c); else fail(); }; 
+                document.getElementById('os').appendChild(b); 
+            });
         } else {
             sA = ""; sB = ""; document.getElementById('stage-tag').innerText = "階段二：超級組裝大師";
             g.innerHTML = `<div style="color:#888;margin-bottom:10px">挑戰：${q.g}</div><div class="sentence">${q.t.replace("____", `<span id="pA" class="blank">?</span><span id="pB" class="blank">?</span>`)}</div><div class="options" id="oA"></div><div class="options" id="oB"></div>`;
-            q.p.forEach(p => { const b = document.createElement('button'); b.className='btn'; b.innerText=p; b.onclick=()=>{ sA=p; document.getElementById('pA').innerText=p.replace("-",""); check(q); }; document.getElementById('oA').appendChild(b); });
-            q.r.forEach(r => { const b = document.createElement('button'); b.className='btn'; b.innerText=r; b.onclick=()=>{ sB=r; document.getElementById('pB').innerText=r; check(q); }; document.getElementById('oB').appendChild(b); });
+            
+            // 隨機排列前綴
+            shuffle([...q.p]).forEach(p => { 
+                const b = document.createElement('button'); b.className='btn'; b.innerText=p; 
+                b.onclick=()=>{ sA=p; document.getElementById('pA').innerText=p.replace("-",""); check(q); }; 
+                document.getElementById('oA').appendChild(b); 
+            });
+            // 隨機排列字根
+            shuffle([...q.r]).forEach(r => { 
+                const b = document.createElement('button'); b.className='btn'; b.innerText=r; 
+                b.onclick=()=>{ sB=r; document.getElementById('pB').innerText=r; check(q); }; 
+                document.getElementById('oB').appendChild(b); 
+            });
         }
     }
+
     function check(q) { if(sA && sB) { if(sA===q.aA && sB===q.aB) win(q.target); else fail(); } }
     function fail() { document.getElementById('msg').innerHTML = "<span style='color:red'>哎呀，再想一下下！</span>"; }
     function win(word) {
@@ -124,6 +150,7 @@
         confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
     }
     function next() { idx++; if (idx < 50) render(); else { clearInterval(timer); document.getElementById('game').innerHTML = `<h2>🏆 5000分大挑戰達成！</h2><p>費時：${document.getElementById('timer').innerText}</p>`; document.getElementById('next').style.display = "none"; } }
+    
     runTimer(); render();
 </script>
 </body>
