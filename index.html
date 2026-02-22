@@ -9,6 +9,9 @@
         :root { --primary: #1e2a47; --gold: #d4af37; --green: #28a745; --bg: #f4f7f9; }
         body { font-family: 'PingFang TC', sans-serif; background: var(--bg); display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
         .container { background: white; padding: 30px; border-radius: 30px; box-shadow: 0 15px 50px rgba(0,0,0,0.15); max-width: 750px; width: 95%; text-align: center; border-top: 10px solid var(--primary); }
+        .nav-buttons { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; }
+        .nav-btn { background: #eee; border: none; padding: 8px 15px; border-radius: 10px; cursor: pointer; font-weight: bold; font-size: 0.85rem; color: #555; transition: 0.3s; }
+        .nav-btn:hover { background: var(--primary); color: white; }
         .stats { display: flex; justify-content: space-between; font-weight: bold; margin-bottom: 10px; }
         .progress-box { width: 100%; height: 12px; background: #eee; border-radius: 10px; margin-bottom: 15px; overflow: hidden; }
         .progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--primary), #4facfe); transition: 0.4s; }
@@ -29,6 +32,10 @@
 </head>
 <body>
 <div class="container">
+    <div class="nav-buttons">
+        <button class="nav-btn" onclick="jumpTo(0)">🏠 階段 1：字尾挑戰</button>
+        <button class="nav-btn" onclick="jumpTo(25)">🚀 階段 2：組裝大師</button>
+    </div>
     <div class="stats"><span id="timer">⏱️ 00:00</span><span id="score">🏆 0</span></div>
     <div class="progress-box"><div class="progress-fill" id="pb"></div></div>
     <div id="stage-tag" class="stage-tag">階段一：字尾變形挑戰</div>
@@ -39,8 +46,8 @@
 </div>
 
 <script>
-    // 完整的 50 題資料與先前一致
     const data = [
+        // 1-25 題 
         { b: "SUCCEED", t: "The plan was a huge ____.", o: ["SUCCESS", "[-FUL]", "[-LY]"], a: "SUCCESS", c: "SUCCESS" },
         { b: "RELY", t: "We need a ____ partner.", o: ["RELIABLE", "RELYANCE", "RELYLY"], a: "RELIABLE", c: "RELIABLE" },
         { b: "PROFESSION", t: "Act in a ____ manner.", o: ["PROFESSIONAL", "PROFESSIONISM", "PROFESSIONLY"], a: "PROFESSIONAL", c: "PROFESSIONAL" },
@@ -66,35 +73,37 @@
         { b: "EFFICIENT", t: "Work more ____.", o: ["EFFICIENTLY", "EFFICIENCY", "EFFICIENT"], a: "EFFICIENTLY", c: "EFFICIENTLY" },
         { b: "ORGANIZE", t: "A great ____.", o: ["ORGANIZER", "ORGANIZATION", "ORGANIZED"], a: "ORGANIZER", c: "ORGANIZER" },
         { b: "INFORM", t: "This is very ____.", o: ["INFORMATIVE", "INFORMATION", "INFORMED"], a: "INFORMATIVE", c: "INFORMATIVE" },
+
+        // 26-50 題 (已修正 PREVIEW 題)
         { g: "遠端會議", target: "TELECONFERENCE", t: "Join the ____.", p: ["TELE-", "VIDEO-", "CO-"], r: ["CONFERENCE", "VISION", "PHONE"], aA: "TELE-", aB: "CONFERENCE" },
         { g: "跨國公司", target: "MULTINATIONAL", t: "A ____ company.", p: ["MULTI-", "INTER-", "TRANS-"], r: ["NATIONAL", "CULTURAL", "ACTIVE"], aA: "MULTI-", aB: "NATIONAL" },
         { g: "預付款項", target: "PREPAYMENT", t: "A ____ is required.", p: ["PRE-", "POST-", "RE-"], r: ["PAYMENT", "ORDER", "FIX"], aA: "PRE-", aB: "PAYMENT" },
-        { g: "重新啟動", target: "REACTIVATE", t: "____ your account.", p: ["RE-", "DE-", "OVER-"], r: ["ACTIVATE", "STORE", "PLAY"], aA: "RE-", aB: "REACTIVATE" },
+        { g: "重新啟動", target: "REACTIVATE", t: "____ your account.", p: ["RE-", "DE-", "OVER-"], r: ["ACTIVATE", "STORE", "PLAY"], aA: "RE-", aB: "ACTIVATE" },
         { g: "子公司", target: "SUBDIVISION", t: "Our Asian ____.", p: ["SUB-", "SUPER-", "TRANS-"], r: ["DIVISION", "SECTION", "PART"], aA: "SUB-", aB: "DIVISION" },
-        { g: "共同創辦人", target: "COFOUNDER", t: "She is the ____.", p: ["CO-", "SUB-", "EX-"], r: ["FOUNDER", "WORKER", "AUTHOR"], aA: "CO-", aB: "COFOUNDER" },
-        { g: "生態友善", target: "ECOFRIENDLY", t: "We use ____ bags.", p: ["ECO-", "BIO-", "RE-"], r: ["FRIENDLY", "LOGICAL", "ACTIVE"], aA: "ECO-", aB: "ECOFRIENDLY" },
-        { g: "主管者", target: "SUPERVISOR", t: "Ask your ____.", p: ["SUPER-", "SUB-", "HYPER-"], r: ["VISOR", "VISION", "INTEND"], aA: "SUPER-", aB: "SUPERVISOR" },
-        { g: "運輸中", target: "TRANSIT", t: "Goods in ____.", p: ["TRANS-", "INTER-", "SUB-"], r: ["IT", "PORT", "FER"], aA: "TRANS-", aB: "TRANSIT" },
-        { g: "互動式", target: "INTERACTIVE", t: "An ____ app.", p: ["INTER-", "RE-", "PRE-"], r: ["ACTIVE", "ACTION", "CHANGE"], aA: "INTER-", aB: "INTERACTIVE" },
-        { g: "微處理器", target: "MICROPROCESSOR", t: "A new ____.", p: ["MICRO-", "MACRO-", "TELE-"], r: ["PROCESSOR", "SYSTEM", "PHONE"], aA: "MICRO-", aB: "MICROPROCESSOR" },
-        { g: "過度工作", target: "OVERWORKED", t: "Staff are ____.", p: ["OVER-", "UNDER-", "RE-"], r: ["WORKED", "PAID", "LOADED"], aA: "OVER-", aB: "OVERWORKED" },
-        { g: "自動化", target: "AUTOMATION", t: "Focus on ____.", p: ["AUTO-", "SELF-", "RE-"], r: ["MATION", "MOBILE", "MATIC"], aA: "AUTO-", aB: "AUTOMATION" },
-        { g: "半年度的", target: "SEMIANNUAL", t: "The ____ report.", p: ["SEMI-", "BI-", "MULTI-"], r: ["ANNUAL", "WEEKLY", "MONTHLY"], aA: "SEMI-", aB: "SEMIANNUAL" },
-        { g: "延期", target: "POSTPONE", t: "____ the game.", p: ["POST-", "PRE-", "RE-"], r: ["PONE", "DATE", "LAY"], aA: "POST-", aB: "POSTPONE" },
-        { g: "異常的", target: "ABNORMAL", t: "This is ____.", p: ["AB-", "UN-", "DE-"], r: ["NORMAL", "SURE", "ACTIVE"], aA: "AB-", aB: "ABNORMAL" },
-        { g: "生物科技", target: "BIOTECHNOLOGY", t: "A ____ firm.", p: ["BIO-", "ECO-", "NEO-"], r: ["TECHNOLOGY", "LOGY", "SPHERE"], aA: "BIO-", aB: "BIOTECHNOLOGY" },
-        { g: "低估", target: "UNDERESTIMATE", t: "Don't ____ him.", p: ["UNDER-", "OVER-", "RE-"], r: ["ESTIMATE", "VALUE", "RATE"], aA: "UNDER-", aB: "UNDERESTIMATE" },
-        { g: "多功能", target: "MULTIFUNCTION", t: "A ____ tool.", p: ["MULTI-", "UNI-", "BI-"], r: ["FUNCTION", "PURPOSE", "USE"], aA: "MULTI-", aB: "MULTIFUNCTION" },
-        { g: "重新裝潢", target: "RENOVATE", t: "____ the lab.", p: ["RE-", "DE-", "PRE-"], r: ["NOVATE", "BUILD", "PLACE"], aA: "RE-", aB: "RENOVATE" },
-        { g: "出口", target: "EXPORT", t: "We ____ cars.", p: ["EX-", "IM-", "TRANS-"], r: ["PORT", "PORT", "PORT"], aA: "EX-", aB: "EXPORT" },
-        { g: "內部網路", target: "INTRANET", t: "Use the ____.", p: ["INTRA-", "INTER-", "EXTRA-"], r: ["NET", "LINK", "FACE"], aA: "INTRA-", aB: "INTRANET" },
-        { g: "雙語的", target: "BILINGUAL", t: "She is ____.", p: ["BI-", "MONO-", "MULTI-"], r: ["LINGUAL", "CULTURAL", "LATERAL"], aA: "BI-", aB: "BILINGUAL" },
-        { g: "預覽", target: "PREVIEW", t: "Watch the ____.", p: ["PRE-", "RE-", "POST-"], r: ["VIEW", "VIEW", "VIEW"], aA: "PRE-", aB: "PREVIEW" },
-        { g: "撤回", target: "WITHDRAW", t: "____ the bid.", p: ["WITH-", "OUT-", "UP-"], r: ["DRAW", "HOLD", "STAND"], aA: "WITH-", aB: "WITHDRAW" }
+        { g: "共同創辦人", target: "COFOUNDER", t: "She is the ____.", p: ["CO-", "SUB-", "EX-"], r: ["FOUNDER", "WORKER", "AUTHOR"], aA: "CO-", aB: "FOUNDER" },
+        { g: "生態友善", target: "ECOFRIENDLY", t: "We use ____ bags.", p: ["ECO-", "BIO-", "RE-"], r: ["FRIENDLY", "LOGICAL", "ACTIVE"], aA: "ECO-", aB: "FRIENDLY" },
+        { g: "主管者", target: "SUPERVISOR", t: "Ask your ____.", p: ["SUPER-", "SUB-", "HYPER-"], r: ["VISOR", "VISION", "INTEND"], aA: "SUPER-", aB: "VISOR" },
+        { g: "運輸中", target: "TRANSIT", t: "Goods in ____.", p: ["TRANS-", "INTER-", "SUB-"], r: ["IT", "PORT", "FER"], aA: "TRANS-", aB: "IT" },
+        { g: "互動式", target: "INTERACTIVE", t: "An ____ app.", p: ["INTER-", "RE-", "PRE-"], r: ["ACTIVE", "ACTION", "CHANGE"], aA: "INTER-", aB: "ACTIVE" },
+        { g: "微處理器", target: "MICROPROCESSOR", t: "A new ____.", p: ["MICRO-", "MACRO-", "TELE-"], r: ["PROCESSOR", "SYSTEM", "PHONE"], aA: "MICRO-", aB: "PROCESSOR" },
+        { g: "過度工作", target: "OVERWORKED", t: "Staff are ____.", p: ["OVER-", "UNDER-", "RE-"], r: ["WORKED", "PAID", "LOADED"], aA: "OVER-", aB: "WORKED" },
+        { g: "自動化", target: "AUTOMATION", t: "Focus on ____.", p: ["AUTO-", "SELF-", "RE-"], r: ["MATION", "MOBILE", "MATIC"], aA: "AUTO-", aB: "MATION" },
+        { g: "半年度的", target: "SEMIANNUAL", t: "The ____ report.", p: ["SEMI-", "BI-", "MULTI-"], r: ["ANNUAL", "WEEKLY", "MONTHLY"], aA: "SEMI-", aB: "ANNUAL" },
+        { g: "延期", target: "POSTPONE", t: "____ the game.", p: ["POST-", "PRE-", "RE-"], r: ["PONE", "DATE", "LAY"], aA: "POST-", aB: "PONE" },
+        { g: "異常的", target: "ABNORMAL", t: "This is ____.", p: ["AB-", "UN-", "DE-"], r: ["NORMAL", "SURE", "ACTIVE"], aA: "AB-", aB: "NORMAL" },
+        { g: "生物科技", target: "BIOTECHNOLOGY", t: "A ____ firm.", p: ["BIO-", "ECO-", "NEO-"], r: ["TECHNOLOGY", "LOGY", "SPHERE"], aA: "BIO-", aB: "TECHNOLOGY" },
+        { g: "低估", target: "UNDERESTIMATE", t: "Don't ____ him.", p: ["UNDER-", "OVER-", "RE-"], r: ["ESTIMATE", "VALUE", "RATE"], aA: "UNDER-", aB: "ESTIMATE" },
+        { g: "多功能", target: "MULTIFUNCTION", t: "A ____ tool.", p: ["MULTI-", "UNI-", "BI-"], r: ["FUNCTION", "PURPOSE", "USE"], aA: "MULTI-", aB: "FUNCTION" },
+        { g: "重新裝潢", target: "RENOVATE", t: "____ the lab.", p: ["RE-", "DE-", "PRE-"], r: ["NOVATE", "BUILD", "PLACE"], aA: "RE-", aB: "NOVATE" },
+        { g: "出口", target: "EXPORT", t: "We ____ cars.", p: ["EX-", "IM-", "TRANS-"], r: ["PORT", "PORT", "PORT"], aA: "EX-", aB: "PORT" },
+        { g: "內部網路", target: "INTRANET", t: "Use the ____.", p: ["INTRA-", "INTER-", "EXTRA-"], r: ["NET", "LINK", "FACE"], aA: "INTRA-", aB: "NET" },
+        { g: "雙語的", target: "BILINGUAL", t: "She is ____.", p: ["BI-", "MONO-", "MULTI-"], r: ["LINGUAL", "CULTURAL", "LATERAL"], aA: "BI-", aB: "LINGUAL" },
+        { g: "預覽", target: "PREVIEW", t: "Watch the ____.", p: ["PRE-", "RE-", "POST-"], r: ["VIEW", "DICT", "SENT"], aA: "PRE-", aB: "VIEW" },
+        { g: "撤回", target: "WITHDRAW", t: "____ the bid.", p: ["WITH-", "OUT-", "UP-"], r: ["DRAW", "HOLD", "STAND"], aA: "WITH-", aB: "DRAW" }
     ];
 
     let idx = 0, score = 0, sec = 0, sA = "", sB = "", timer;
-    let hasFailedThisTurn = false; // 關鍵：追蹤該題是否已經錯過
+    let hasFailedThisTurn = false;
 
     function realShuffle(array) {
         let currentIndex = array.length, randomIndex;
@@ -106,10 +115,14 @@
         return array;
     }
 
+    function jumpTo(targetIdx) {
+        idx = targetIdx; score = 0; sec = 0; render();
+    }
+
     function runTimer() { timer = setInterval(() => { sec++; let m = Math.floor(sec/60).toString().padStart(2,'0'), s = (sec%60).toString().padStart(2,'0'); document.getElementById('timer').innerText = `⏱️ ${m}:${s}`; }, 1000); }
 
     function render() {
-        hasFailedThisTurn = false; // 進入新題目時，重置錯誤狀態
+        hasFailedThisTurn = false;
         const q = data[idx], g = document.getElementById('game'), pic = document.getElementById('mibi-pic');
         document.getElementById('pb').style.width = (idx/50*100)+"%";
         document.getElementById('score').innerText = `🏆 ${score}`;
@@ -141,17 +154,9 @@
     }
 
     function check(q) { if(sA && sB) { if(sA===q.aA && sB===q.aB) win(q.target); else fail(); } }
-    
-    function fail() { 
-        hasFailedThisTurn = true; // 學生按錯了，標記該題不給分
-        document.getElementById('msg').innerHTML = "<span style='color:red'>哎呀，錯囉！這題不能拿分了，再試試！</span>"; 
-    }
-
+    function fail() { hasFailedThisTurn = true; document.getElementById('msg').innerHTML = "<span style='color:red'>哎呀，錯囉！這題不能拿分了，再試試！</span>"; }
     function win(word) {
-        // 只有「第一次就答對」才加分
-        if (!hasFailedThisTurn) {
-            score += 100;
-        }
+        if (!hasFailedThisTurn) { score += 100; }
         const pic = document.getElementById('mibi-pic'); pic.src = "mibi_happy.png"; pic.classList.add('jump');
         document.getElementById('game').innerHTML = `<div class="sentence">${data[idx].t.replace("____", `<span class="win-word">${word}</span>`)}</div>`;
         document.getElementById('msg').innerHTML = hasFailedThisTurn ? 
@@ -160,7 +165,6 @@
         document.getElementById('next').style.display = "block";
         if(!hasFailedThisTurn) confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
     }
-
     function next() { idx++; if (idx < 50) render(); else { clearInterval(timer); document.getElementById('game').innerHTML = `<h2>🏆 5000分大挑戰達成！</h2><p>最終得分：${score}</p><p>費時：${document.getElementById('timer').innerText}</p>`; document.getElementById('next').style.display = "none"; } }
     
     runTimer(); render();
